@@ -40,30 +40,35 @@ function downloadImageByURL(url, filePath) {
 getRepoContributors(owner, repo, function(err, result) {
   //execution
 
-  if (!owner || !repo) {
-    //if user does not enter a owner name or repo name, it will not process the request to download
-    console.log("Aye i need both dem owner and repo names");
+  if (process.argv.length < 4) {
+    /*
+    program will stop if user does not enter:
+    node download_avatars.js owner name repo name
+    in that order
+    */
+    console.log("you have not entered the repo owner and repo name");
     console.log(
       "Please enter in this format: $node download_avatars.js <REPOOWNER> <REPONAME>"
     );
+  } else {
+    console.log("Errors: ", err);
+    if (!fs.existsSync(dir)) {
+      // checks if there is a ./avatars/ directory
+      console.log("ERROR! NO AVATAR DIRECTORY");
+      console.log("CREATING ./AVATARS/ DIRECTORY");
+      fs.mkdirSync(dir);
+      // creates ./avatars/ directory for user and continues with code
+    }
+    for (var i of result) {
+      //using for-of loop to grab all IDs
+      console.log("Avatar ID: " + i.login + ", URL: ", i.avatar_url);
+    }
+    console.log("Downloading images to ./avatars/");
+    for (var x of result) {
+      //using for-of loop to grab url and create file name based on avatarname
+      var img = x.login;
+      downloadImageByURL(x.avatar_url, dir + x.login + ".jpg");
+    }
+    console.log("Download Complete. Have fun.");
   }
-  console.log("Errors: ", err);
-  if (!fs.existsSync(dir)) {
-    // checks if there is a ./avatars/ directory
-    console.log("ERROR! NO AVATAR DIRECTORY");
-    console.log("CREATING ./AVATARS/ DIRECTORY");
-    fs.mkdirSync(dir);
-    // creates ./avatars/ directory for user and continues with code
-  }
-  for (var i of result) {
-    //using for-of loop to grab all IDs
-    console.log("Avatar ID: " + i.login + ", URL: ", i.avatar_url);
-  }
-  console.log("Downloading images to ./avatars/");
-  for (var x of result) {
-    //using for-of loop to grab url and create file name based on avatarname
-    var img = x.login;
-    downloadImageByURL(x.avatar_url, dir + x.login + ".jpg");
-  }
-  console.log("Download Complete. Have fun.");
 });
